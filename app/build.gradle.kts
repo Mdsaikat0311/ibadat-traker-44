@@ -142,3 +142,22 @@ dependencies {
   "ksp"(libs.androidx.room.compiler)
   "ksp"(libs.moshi.kotlin.codegen)
 }
+
+val apkBuildDir = layout.buildDirectory
+val rootProjectDir = rootProject.layout.projectDirectory
+
+val copyDebugApkToOutputs = tasks.register<Copy>("copyDebugApkToOutputs") {
+  mustRunAfter("assembleDebug")
+  from(apkBuildDir.file("outputs/apk/debug/app-debug.apk"))
+  into(rootProjectDir.dir("build-outputs"))
+}
+
+val copyDebugApkToDownload = tasks.register<Copy>("copyDebugApkToDownload") {
+  mustRunAfter("assembleDebug")
+  from(apkBuildDir.file("outputs/apk/debug/app-debug.apk"))
+  into(rootProjectDir.dir("APK DOWNLOAD"))
+}
+
+tasks.matching { it.name == "assembleDebug" }.configureEach {
+  finalizedBy(copyDebugApkToOutputs, copyDebugApkToDownload)
+}
